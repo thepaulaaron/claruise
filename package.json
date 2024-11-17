@@ -19,6 +19,8 @@
     "svelte": "^3.55.0"
   },
   "dependencies": {
+    "plotly.js": "^2.35.2",
+    "plotly.js-dist": "^2.35.2",
     "sirv-cli": "^2.0.0"
   }
 }
