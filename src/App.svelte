@@ -6,12 +6,18 @@
     "Xyllie": "ESFP",
     "Pen": "INFJ",
     "Clyde": "ISTJ",
-		"Nikki": "INFP",
-		"Bdog": "INTP",
-		"Abi": "INFJ",
-		"Chichut": "ENFJ",
-		"Zy": "ENFP",
-		"MJ": "INTJ",
+    "Nikki": "INFP",
+    "Bdog": "INTP",
+    "Abi": "INFJ",
+    "Chichut": "ENFJ",
+    "Zy": "ENFP",
+    "MJ": "INTJ",
+    "Aeden": "ENFP",
+    "Gab": "ENTP",
+    "Dagz": "ENTJ",
+    "Gids": "INTP",
+    "Knet": "ISTP",
+    "David": "INTP"
     // Add more people as needed
   };
   
@@ -74,13 +80,16 @@ Object.keys(people).forEach((person1, index1) => {
         .force("charge", d3.forceManyBody().strength(-200))
         .force("center", d3.forceCenter(width / 2, height / 2));
   
-      const link = svg.append("g")
+        const link = svg.append("g")
         .selectAll(".link")
         .data(links)
         .enter().append("line")
         .attr("class", d => `link ${getMatchLevelClass(d.value)}`)
         .style("stroke-width", 2)
-        .style("stroke", d => getLinkColor(d.value));  // Set the link color here
+        .style("stroke", d => getLinkColor(d.value))  // Set the link color here
+        .style("opacity", 0.3);  // Set the opacity to reduce the visibility of the links
+
+
   
       const node = svg.append("g")
         .selectAll(".node")
@@ -111,16 +120,33 @@ Object.keys(people).forEach((person1, index1) => {
   
       // Add labels to links for match level
       svg.append("g")
-        .selectAll(".linkLabel")
-        .data(links)
+        .selectAll(".nodeLabel")
+        .data(nodes)
         .enter().append("text")
-        .attr("class", "linkLabel")
-        .attr("x", d => (d.source.x + d.target.x) / 2)
-        .attr("y", d => (d.source.y + d.target.y) / 2)
-        .attr("dy", -10)
-        .text(d => d.value)
-        .style("font-size", "10px")
-        .style("fill", "black");
+        .attr("class", "nodeLabel")
+        .attr("x", d => d.x)
+        .attr("y", d => d.y)
+        .attr("dx", 12)
+        .attr("dy", 4)
+        .text(d => `${d.id} (${d.mbti})`)  // Add MBTI type to name
+        .style("font-size", "12px")
+        .style("fill", "black")
+        .style("font-weight", "bold");
+
+        svg.append("text")
+            .attr("x", width / 2)  // Center the title
+            .attr("y", 30)         // Position the title above the graph
+            .attr("text-anchor", "middle")
+            .style("font-size", "20px")
+            .style("font-weight", "bold")
+            .text("SETUP Compatibility");
+
+            svg.append("text")
+            .attr("x", width / 2)  // Center the title
+            .attr("y", 60)         // Position the title above the graph
+            .attr("text-anchor", "middle")
+            .style("font-size", "15px")
+            .text("Made by Claruise (Clyde Aaron Louise)");
   
       simulation.on("tick", () => {
         link
@@ -199,6 +225,29 @@ svg.append("g")
         event.subject.fx = null;
         event.subject.fy = null;
       }
+
+      function dragStarted(event) {
+  if (!event.active) simulation.alphaTarget(0.3).restart();
+  event.subject.fx = event.subject.x;
+  event.subject.fy = event.subject.y;
+
+  // Dim all links by reducing opacity
+  link.style("opacity", 0.1);  // Dim all links
+  
+  // Highlight the links connected to the dragged node by restoring opacity for those
+  link.filter(d => d.source === event.subject || d.target === event.subject)
+    .style("opacity", 1);  // Keep the original color but restore full opacity
+}
+
+function dragEnded(event) {
+  if (!event.active) simulation.alphaTarget(0);
+  event.subject.fx = null;
+  event.subject.fy = null;
+
+  // Restore the original opacity
+  link.style("opacity", 0.3);  // Restore the original opacity
+}
+
     });
   </script>
   
@@ -216,7 +265,8 @@ svg.append("g")
       border: 1px solid #ccc;
     }
   </style>
-  
+
+
   <div class="container">
     <svg width="1000" height="800"></svg>
   </div>
